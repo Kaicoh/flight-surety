@@ -18,7 +18,8 @@
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
     "ethlint": "^1.2.4",
-    "truffle": "5.0.17",
+    "openzeppelin-solidity": "^2.2.0",
+    "truffle": "^5.0.17",
     "web3": "1.0.0-beta.55"
   }
 }
