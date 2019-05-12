@@ -9,6 +9,9 @@
     "npm": "6.9.0"
   },
   "scripts": {
+    "test": "yarn run compile && yarn run migrate && truffle test",
+    "compile": "rimraf ./build && truffle compile",
+    "migrate": "truffle migrate --reset",
     "eslint": "eslint migrations/**/*.js test/**/*.js truffle.js",
     "solium": "solium -d contracts",
     "lint": "npm run eslint && npm run solium"
@@ -19,6 +22,7 @@
     "eslint-plugin-import": "^2.14.0",
     "ethlint": "^1.2.4",
     "openzeppelin-solidity": "^2.2.0",
+    "rimraf": "^2.6.3",
     "truffle": "^5.0.17",
     "web3": "1.0.0-beta.55"
   }
