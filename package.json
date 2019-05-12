@@ -1,0 +1,24 @@
+{
+  "name": "flight-surety",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Kaicoh <sumireminami@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": "10.15.3",
+    "npm": "6.9.0"
+  },
+  "scripts": {
+    "eslint": "eslint migrations/**/*.js test/**/*.js truffle.js",
+    "solium": "solium -d contracts",
+    "lint": "npm run eslint && npm run solium"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "ethlint": "^1.2.4",
+    "truffle": "5.0.17",
+    "web3": "1.0.0-beta.55"
+  }
+}
