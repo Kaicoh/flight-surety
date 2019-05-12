@@ -41,9 +41,15 @@ contract('AirlineData', (accounts) => {
         }
     });
 
-    // describe('registers a new airline', () => {
-    //     describe('without consensus when registered count is less than 4');
+    describe('registers a new airline', () => {
+        it('without consensus when registered count is less than 4', async () => {
+            await instance.registerAirline('2nd airline', airline2, { from: airline1 });
+            await instance.registerAirline('3rd airline', airline3, { from: airline1 });
+            await instance.registerAirline('4th airline', airline4, { from: airline1 });
+            const registeredCount = await instance.registeredCount.call();
+            assert.equal(registeredCount.toNumber(), 4);
+        });
 
-    //     describe('with consensus when registered count is greater than or equal to 4');
-    // });
+        // describe('with consensus when registered count is greater than or equal to 4');
+    });
 });
