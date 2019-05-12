@@ -9,6 +9,7 @@ contract AirlineData {
 
     uint public registeredCount = 0;
     uint private constant CAN_REGISTER_WITHOUT_CONSENSUS = 4;
+    uint private constant DEPOSIT_THRESHOLD = 10 ether;
 
     struct Airline {
         string name;
@@ -38,6 +39,11 @@ contract AirlineData {
         _;
     }
 
+    modifier enoughDeposit(address _address) {
+        require(airlines[_address].deposit >= DEPOSIT_THRESHOLD, "Inadequate deposit");
+        _;
+    }
+
     constructor(string memory _name) public {
         // spec: First airline is registered when contract is deployed.
         _entry(msg.sender, _name);
@@ -63,6 +69,18 @@ contract AirlineData {
                 _register(_address);
             }
         }
+    }
+
+    function deposit()
+        public
+        payable
+        isRegistered(msg.sender)
+    {
+        airlines[msg.sender].deposit += msg.value;
+    }
+
+    function canParticipate(address _address) public view returns(bool) {
+        return airlines[_address].deposit >= DEPOSIT_THRESHOLD;
     }
 
     function _entry(address _address, string memory _name)

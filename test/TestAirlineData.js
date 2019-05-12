@@ -58,4 +58,14 @@ contract('AirlineData', (accounts) => {
             assert.equal(registeredCount.toNumber(), 5);
         });
     });
+
+    it('can deposit ether', async () => {
+        let canParticipate = await instance.canParticipate.call(airline1);
+        assert.equal(canParticipate, false);
+
+        await instance.deposit({ from: airline1, value: web3.utils.toWei('10', 'ether') });
+
+        canParticipate = await instance.canParticipate.call(airline1);
+        assert.equal(canParticipate, true);
+    });
 });
