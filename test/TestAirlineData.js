@@ -1,6 +1,6 @@
-const AirlineData = artifacts.require('AirlineData');
+const AirlineControl = artifacts.require('AirlineControl');
 
-contract('AirlineData', (accounts) => {
+contract('AirlineControl', (accounts) => {
     let instance;
 
     let airline1;
@@ -20,7 +20,7 @@ contract('AirlineData', (accounts) => {
     });
 
     beforeEach(async () => {
-        instance = await AirlineData.deployed();
+        instance = await AirlineControl.deployed();
     });
 
     it('registers first airline when deployed', async () => {

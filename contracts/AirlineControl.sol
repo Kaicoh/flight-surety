@@ -2,7 +2,7 @@ pragma solidity ^0.5.2;
 
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-contract AirlineData {
+contract AirlineControl {
     using SafeMath for uint;
 
     mapping (address => Airline) private airlines;

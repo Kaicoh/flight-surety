@@ -1,5 +1,5 @@
-const AirlineData = artifacts.require('AirlineData');
+const AirlineControl = artifacts.require('AirlineControl');
 
 module.exports = function (deployer) {
-    deployer.deploy(AirlineData, 'First airline');
+    deployer.deploy(AirlineControl, 'First airline');
 };
