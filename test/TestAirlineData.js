@@ -30,26 +30,32 @@ contract('AirlineData', (accounts) => {
 
     it('can not register a new airline when requested by not registered airline', async () => {
         try {
-            await instance.registerAirline('some airline', airline2, { from: airline3 });
+            await instance.registerAirline(airline2, 'some airline', { from: airline3 });
             throw new Error('unreachable error');
         } catch (error) {
-            assert.match(
-                error.message,
-                /Only registered airline is allowed to execute/,
-                'Not registered can register a new airline',
-            );
+            assert.match(error.message, /Not registered yet/);
         }
     });
 
     describe('registers a new airline', () => {
         it('without consensus when registered count is less than 4', async () => {
-            await instance.registerAirline('2nd airline', airline2, { from: airline1 });
-            await instance.registerAirline('3rd airline', airline3, { from: airline1 });
-            await instance.registerAirline('4th airline', airline4, { from: airline1 });
+            await instance.registerAirline(airline2, '2nd airline', { from: airline1 });
+            await instance.registerAirline(airline3, '3rd airline', { from: airline1 });
+            await instance.registerAirline(airline4, '4th airline', { from: airline1 });
             const registeredCount = await instance.registeredCount.call();
             assert.equal(registeredCount.toNumber(), 4);
         });
 
-        // describe('with consensus when registered count is greater than or equal to 4');
+        it('with consensus when registered count is greater than or equal to 4', async () => {
+            await instance.registerAirline(airline5, '5th airline', { from: airline1 });
+
+            let registeredCount = await instance.registeredCount.call();
+            assert.equal(registeredCount.toNumber(), 4);
+
+            await instance.registerAirline(airline5, '5th airline', { from: airline2 });
+
+            registeredCount = await instance.registeredCount.call();
+            assert.equal(registeredCount.toNumber(), 5);
+        });
     });
 });

@@ -1,6 +1,10 @@
 pragma solidity ^0.5.2;
 
+import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
+
 contract AirlineData {
+    using SafeMath for uint;
+
     mapping (address => Airline) private airlines;
 
     uint public registeredCount = 0;
@@ -9,47 +13,75 @@ contract AirlineData {
     struct Airline {
         string name;
         Status status;
+        uint approved; // for multi-party consensus
         uint deposit;
     }
 
     enum Status {
-        NotRegistered,
-        Registered,
-        Participating
+        BeforeEntry,
+        Entried,
+        Registered
     }
 
-    modifier isRegistered() {
-        require(
-            airlines[msg.sender].status != Status.NotRegistered,
-            "Only registered airline is allowed to execute"
-        );
+    modifier isBeforeEntry(address _address) {
+        require(airlines[_address].status == Status.BeforeEntry, "Already entried");
+        _;
+    }
+
+    modifier isEntried(address _address) {
+        require(airlines[_address].status == Status.Entried, "Before entry or already registered");
+        _;
+    }
+
+    modifier isRegistered(address _address) {
+        require(airlines[_address].status == Status.Registered, "Not registered yet");
         _;
     }
 
     constructor(string memory _name) public {
         // spec: First airline is registered when contract is deployed.
-        _addAirline(_name, msg.sender);
+        _entry(msg.sender, _name);
+        _register(msg.sender);
     }
 
-    function registerAirline(string memory _name, address _address)
+    function registerAirline(address _address, string memory _name)
         public
-        isRegistered
+        isRegistered(msg.sender)
     {
+        if (airlines[_address].status == Status.BeforeEntry) {
+            _entry(_address, _name);
+        }
+
         // spec: Only existing airline may register a new airline until there are at least four airlines registered
         if (registeredCount < CAN_REGISTER_WITHOUT_CONSENSUS) {
-            _addAirline(_name, _address);
+            _register(_address);
+        } else {
+            airlines[_address].approved++;
+
+            // spec: Registration of fifth and subsequent airlines requires multi-party consensus of 50% of registered airlines
+            if (airlines[_address].approved >= registeredCount.div(2)) {
+                _register(_address);
+            }
         }
     }
 
-    function _addAirline(string memory _name, address _address) private {
-        require(airlines[_address].status == Status.NotRegistered, "Already registered");
-
+    function _entry(address _address, string memory _name)
+        private
+        isBeforeEntry(_address)
+    {
         airlines[_address] = Airline({
             name: _name,
-            status: Status.Registered,
+            status: Status.Entried,
+            approved: 0,
             deposit: 0
         });
+    }
 
+    function _register(address _address)
+        private
+        isEntried(_address)
+    {
+        airlines[_address].status = Status.Registered;
         registeredCount++;
     }
 }
