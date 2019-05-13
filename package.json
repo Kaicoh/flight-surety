@@ -6,7 +6,7 @@
   "license": "MIT",
   "engines": {
     "node": "10.15.3",
-    "npm": "6.9.0"
+    "yarn": "1.15.2"
   },
   "scripts": {
     "test": "yarn run compile && yarn run migrate && truffle test",
@@ -14,7 +14,7 @@
     "migrate": "truffle migrate --reset",
     "eslint": "eslint migrations/**/*.js test/**/*.js truffle.js",
     "solium": "solium -d contracts",
-    "lint": "npm run eslint && npm run solium"
+    "lint": "yarn run eslint && yarn run solium"
   },
   "devDependencies": {
     "eslint": "^5.16.0",
