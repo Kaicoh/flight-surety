@@ -61,7 +61,7 @@ contract('FlightSuretyApp', (accounts) => {
         ));
 
         // But, AirlineApproved event is emitted.
-        truffleAssert.eventEmitted(tx, 'AirlineApproved', event => (
+        truffleAssert.eventEmitted(tx, 'AirlineVoted', event => (
             event.account === airline5
             && event.name === '5th airline'
             && event.votedCount.toNumber() === 1
@@ -77,11 +77,33 @@ contract('FlightSuretyApp', (accounts) => {
     });
 
     it('funds airline', async () => {
-        const amount = web3.utils.toWei('1', 'ether');
+        const amount = web3.utils.toWei('10', 'ether');
         const tx = await instance.fundAirline({ from: airline1, value: amount });
         truffleAssert.eventEmitted(tx, 'AirlineFunded', (event) => {
             const deposit = web3.utils.fromWei(event.deposit.toString(), 'ether');
-            return event.account === airline1 && deposit === '1';
+            return event.account === airline1 && deposit === '10';
         });
+    });
+
+    it('registers a new flight', async () => {
+        const flight = 'flight123';
+        const timestamp = Date.parse('03 Jan 2009 00:00:00 GMT');
+        const tx = await instance.registerFlight(flight, timestamp, { from: airline1 });
+        truffleAssert.eventEmitted(tx, 'FlightRegistered', event => (
+            event.airline === airline1
+            && event.flight === flight
+            && event.timestamp.toNumber() === timestamp
+        ));
+    });
+
+    it('does not register a new flight when inadequest funded airline', async () => {
+        const flight = 'flight123';
+        const timestamp = Date.parse('03 Jan 2009 00:00:00 GMT');
+        try {
+            await instance.registerFlight(flight, timestamp, { from: airline2 });
+            throw new Error('unreachable error');
+        } catch (error) {
+            assert.match(error.message, /Deposit is inadequet/);
+        }
     });
 });

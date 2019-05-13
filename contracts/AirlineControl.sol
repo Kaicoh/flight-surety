@@ -5,12 +5,12 @@ contract AirlineControl {
 
     struct Airline {
         string name;
-        Status status;
+        AirlineStatus status;
         address[] votedBy; // for multi-party consensus
         uint deposit;
     }
 
-    enum Status {
+    enum AirlineStatus {
         BeforeEntry,
         Entried,
         Registered
@@ -43,7 +43,7 @@ contract AirlineControl {
         view
         returns(bool)
     {
-        return airlines[account].status == Status.BeforeEntry;
+        return airlines[account].status == AirlineStatus.BeforeEntry;
     }
 
     function isEntried(address account)
@@ -51,7 +51,7 @@ contract AirlineControl {
         view
         returns(bool)
     {
-        return airlines[account].status == Status.Entried;
+        return airlines[account].status == AirlineStatus.Entried;
     }
 
     function isRegistered(address account)
@@ -59,14 +59,14 @@ contract AirlineControl {
         view
         returns(bool)
     {
-        return airlines[account].status == Status.Registered;
+        return airlines[account].status == AirlineStatus.Registered;
     }
 
     function entry(address account, string memory name)
         internal
         onlyBeforeEntry(account)
     {
-        Airline memory airline = Airline(name, Status.Entried, new address[](0), 0);
+        Airline memory airline = Airline(name, AirlineStatus.Entried, new address[](0), 0);
         airlines[account] = airline;
     }
 
@@ -91,7 +91,7 @@ contract AirlineControl {
         internal
         onlyEntried(account)
     {
-        airlines[account].status = Status.Registered;
+        airlines[account].status = AirlineStatus.Registered;
         registeredAirlineCount++;
     }
 

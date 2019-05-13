@@ -2,9 +2,10 @@ pragma solidity ^0.5.2;
 
 import "./Authorizable.sol";
 import "./AirlineControl.sol";
+import "./FlightControl.sol";
 import "./Operationable.sol";
 
-contract FlightSuretyData is Authorizable, AirlineControl, Operationable {
+contract FlightSuretyData is Authorizable, AirlineControl, FlightControl, Operationable {
     constructor(address account, string memory name)
         Authorizable()
         AirlineControl(account, name)
@@ -38,6 +39,15 @@ contract FlightSuretyData is Authorizable, AirlineControl, Operationable {
         returns(bool)
     {
         return AirlineControl.isEntried(account);
+    }
+
+    function getDeposit(address account)
+        external
+        view
+        onlyAuthorizedContract
+        returns(uint)
+    {
+        return airlines[account].deposit;
     }
 
     function entryAirline(address account, string calldata name)
@@ -74,5 +84,13 @@ contract FlightSuretyData is Authorizable, AirlineControl, Operationable {
     {
         AirlineControl.fund(account, amount);
         return airlines[account].deposit;
+    }
+
+    function registerFlight(address account, string calldata flight, uint timestamp)
+        external
+        requireIsOperational
+        onlyAuthorizedContract
+    {
+        FlightControl.register(account, flight, timestamp);
     }
 }

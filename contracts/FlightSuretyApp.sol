@@ -7,15 +7,25 @@ import "./Operationable.sol";
 contract FlightSuretyApp is Operationable {
     using SafeMath for uint;
 
+    /********************************************************************************************/
+    /*                                       DATA VARIABLES                                     */
+    /********************************************************************************************/
+
     uint private constant REGISTERING_AIRLINE_WITHOUT_CONSENSUS = 4;
     uint private constant AIRLINE_DEPOSIT_THRESHOLD = 10 ether;
 
     FlightSuretyData flightSuretyData;
 
     event AirlineEntried(address indexed account, string name);
-    event AirlineApproved(address indexed account, string name, uint votedCount);
+    event AirlineVoted(address indexed account, string name, uint votedCount);
     event AirlineRegistered(address indexed account, string name);
     event AirlineFunded(address indexed account, uint deposit);
+
+    event FlightRegistered(address indexed airline, string flight, uint timestamp);
+
+    /********************************************************************************************/
+    /*                                       FUNCTION MODIFIERS                                 */
+    /********************************************************************************************/
 
     modifier isRegisteredAirline() {
         require(
@@ -25,9 +35,25 @@ contract FlightSuretyApp is Operationable {
         _;
     }
 
+    modifier isPermittedAirline() {
+        require(
+            flightSuretyData.getDeposit(msg.sender) >= AIRLINE_DEPOSIT_THRESHOLD,
+            "Deposit is inadequet"
+        );
+        _;
+    }
+
+    /********************************************************************************************/
+    /*                                       CONSTRUCTOR                                        */
+    /********************************************************************************************/
+
     constructor(string memory airlineName) public {
         flightSuretyData = new FlightSuretyData(msg.sender, airlineName);
     }
+
+    /********************************************************************************************/
+    /*                                     SMART CONTRACT FUNCTIONS                             */
+    /********************************************************************************************/
 
     function registerAirline(address account, string memory name)
         public
@@ -57,6 +83,20 @@ contract FlightSuretyApp is Operationable {
         emit AirlineFunded(msg.sender, deposit);
     }
 
+    function registerFlight(string memory flight, uint timestamp)
+        public
+        requireIsOperational
+        isRegisteredAirline
+        isPermittedAirline
+    {
+        flightSuretyData.registerFlight(msg.sender, flight, timestamp);
+        emit FlightRegistered(msg.sender, flight, timestamp);
+    }
+
+    /********************************************************************************************/
+    /*                                     PRIVATE FUNCTIONS                                    */
+    /********************************************************************************************/
+
     function _entryArline(address account, string memory name) private {
         flightSuretyData.entryAirline(account, name);
         emit AirlineEntried(account, name);
@@ -69,7 +109,7 @@ contract FlightSuretyApp is Operationable {
 
     function _voteAirline(address account, string memory name, uint approvalThreshold) private {
         uint votedCount = flightSuretyData.voteAirline(account, msg.sender);
-        emit AirlineApproved(account, name, votedCount);
+        emit AirlineVoted(account, name, votedCount);
 
         if (votedCount >= approvalThreshold) {
             _registerAirline(account, name);
