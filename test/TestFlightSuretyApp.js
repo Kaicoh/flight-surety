@@ -1,4 +1,5 @@
 const FlightSuretyApp = artifacts.require('FlightSuretyApp');
+const FlightSuretyData = artifacts.require('FlightSuretyData');
 const truffleAssert = require('truffle-assertions');
 
 contract('FlightSuretyApp', (accounts) => {
@@ -10,7 +11,7 @@ contract('FlightSuretyApp', (accounts) => {
     let airline4;
     let airline5;
 
-    before(() => {
+    before(async () => {
         /* eslint-disable prefer-destructuring */
         airline1 = accounts[0];
         airline2 = accounts[1];
@@ -18,6 +19,10 @@ contract('FlightSuretyApp', (accounts) => {
         airline4 = accounts[3];
         airline5 = accounts[4];
         /* eslint-enable prefer-destructuring */
+
+        const appContract = await FlightSuretyApp.deployed();
+        const dataContract = await FlightSuretyData.deployed();
+        await dataContract.authorizeContract(appContract.address, { from: accounts[0] });
     });
 
     beforeEach(async () => {

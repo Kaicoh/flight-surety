@@ -33,11 +33,6 @@ contract AirlineControl {
         _;
     }
 
-    constructor(address account, string memory name) internal {
-        entry(account, name);
-        register(account);
-    }
-
     function isBeforeEntry(address account)
         internal
         view

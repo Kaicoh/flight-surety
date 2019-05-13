@@ -47,8 +47,8 @@ contract FlightSuretyApp is Operationable {
     /*                                       CONSTRUCTOR                                        */
     /********************************************************************************************/
 
-    constructor(string memory airlineName) public {
-        flightSuretyData = new FlightSuretyData(msg.sender, airlineName);
+    constructor(address dataContract) public {
+        flightSuretyData = FlightSuretyData(dataContract);
     }
 
     /********************************************************************************************/

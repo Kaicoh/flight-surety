@@ -19,14 +19,14 @@ contract Authorizable is Ownable {
     }
 
     function authorizeContract(address account)
-        internal
+        public
         onlyOwner
     {
         authorizedContracts[account] = true;
     }
 
     function deauthorizeContract(address account)
-        internal
+        public
         onlyOwner
     {
         delete authorizedContracts[account];

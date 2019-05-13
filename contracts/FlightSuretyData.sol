@@ -6,12 +6,10 @@ import "./FlightControl.sol";
 import "./Operationable.sol";
 
 contract FlightSuretyData is Authorizable, AirlineControl, FlightControl, Operationable {
-    constructor(address account, string memory name)
-        Authorizable()
-        AirlineControl(account, name)
-        public
-    {
-        authorizeContract(account);
+    constructor(string memory name) Authorizable() public {
+        // First airline is registered when contract is deployed
+        AirlineControl.entry(msg.sender, name);
+        AirlineControl.register(msg.sender);
     }
 
     function registeredAirlinesCount()
