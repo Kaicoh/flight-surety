@@ -182,6 +182,11 @@ array-unique@^0.3.2:
   resolved "https://registry.yarnpkg.com/array-unique/-/array-unique-0.3.2.tgz#a894b75d4bc4f6cd679ef3244a9fd8f46ae2d428"
   integrity sha1-qJS3XUvE9s1nnvMkSp/Y9Gri1Cg=
 
+assertion-error@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/assertion-error/-/assertion-error-1.1.0.tgz#e60b6b0e8f301bd97e5375215bda406c85118c0b"
+  integrity sha512-jgsaNduz+ndvGyFt3uSuWqvy4lCnIJiovtouQN5JZHOKCS2QuhEdbcQHFhVksz2N2U9hXJo8odG7ETyWlEeuDw==
+
 assign-symbols@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/assign-symbols/-/assign-symbols-1.0.0.tgz#59667f41fadd4f20ccbc2bb96b8d4f7f78ec0367"
@@ -3133,6 +3138,13 @@ to-regex@^3.0.1, to-regex@^3.0.2:
     extend-shallow "^3.0.2"
     regex-not "^1.0.2"
     safe-regex "^1.1.0"
+
+truffle-assertions@^0.8.2:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/truffle-assertions/-/truffle-assertions-0.8.2.tgz#6f0fda2cbc9f9dae597d6a1c81c28bdf7fe85595"
+  integrity sha512-WpUlGMsttkNHuIRYk7Th3I/4d2TeCxDhQI2ZiY+poI8dtfii4seIMXATB9aQLHU+uHAKWxpRJcTzZzm2zl/JnA==
+  dependencies:
+    assertion-error "^1.1.0"
 
 truffle@^5.0.17:
   version "5.0.17"

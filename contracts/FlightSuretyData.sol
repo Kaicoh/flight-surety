@@ -53,12 +53,21 @@ contract FlightSuretyData is Authorizable, AirlineControl {
         AirlineControl.register(account);
     }
 
-    function approveAirline(address account, address from)
+    function voteAirline(address account, address from)
         external
         onlyAuthorizedContract
         returns(uint)
     {
-        AirlineControl.approve(account, from);
-        return airlines[account].approvedFrom.length;
+        AirlineControl.voted(account, from);
+        return airlines[account].votedBy.length;
+    }
+
+    function fundAirline(address account, uint amount)
+        external
+        onlyAuthorizedContract
+        returns(uint)
+    {
+        AirlineControl.fund(account, amount);
+        return airlines[account].deposit;
     }
 }

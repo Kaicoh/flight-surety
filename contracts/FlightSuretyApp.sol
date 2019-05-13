@@ -12,8 +12,9 @@ contract FlightSuretyApp {
     FlightSuretyData flightSuretyData;
 
     event AirlineEntried(address indexed account, string name);
-    event AirlineApproved(address indexed account, string name, uint approvedCount);
+    event AirlineApproved(address indexed account, string name, uint votedCount);
     event AirlineRegistered(address indexed account, string name);
+    event AirlineFunded(address indexed account, uint deposit);
 
     modifier isRegisteredAirline() {
         require(
@@ -40,8 +41,13 @@ contract FlightSuretyApp {
         if (registeredCount < REGISTERING_AIRLINE_WITHOUT_CONSENSUS) {
             _registerAirline(account, name);
         } else {
-            _approveAirline(account, name, registeredCount.div(2));
+            _voteAirline(account, name, registeredCount.div(2));
         }
+    }
+
+    function fundAirline() public payable isRegisteredAirline {
+        uint deposit = flightSuretyData.fundAirline(msg.sender, msg.value);
+        emit AirlineFunded(msg.sender, deposit);
     }
 
     function _entryArline(address account, string memory name) private {
@@ -54,11 +60,11 @@ contract FlightSuretyApp {
         emit AirlineRegistered(account, name);
     }
 
-    function _approveAirline(address account, string memory name, uint registeringThreshold) private {
-        uint approvedCount = flightSuretyData.approveAirline(account, msg.sender);
-        emit AirlineApproved(account, name, approvedCount);
+    function _voteAirline(address account, string memory name, uint approvalThreshold) private {
+        uint votedCount = flightSuretyData.voteAirline(account, msg.sender);
+        emit AirlineApproved(account, name, votedCount);
 
-        if (approvedCount >= registeringThreshold) {
+        if (votedCount >= approvalThreshold) {
             _registerAirline(account, name);
         }
     }

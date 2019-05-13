@@ -6,7 +6,7 @@ contract AirlineControl {
     struct Airline {
         string name;
         Status status;
-        address[] approvedFrom; // for multi-party consensus
+        address[] votedBy; // for multi-party consensus
         uint deposit;
     }
 
@@ -70,21 +70,21 @@ contract AirlineControl {
         airlines[account] = airline;
     }
 
-    function approve(address account, address from)
+    function voted(address account, address from)
         internal
         onlyEntried(account)
         onlyRegistered(from)
     {
         bool isDuplicate = false;
-        for(uint i = 0; i < airlines[account].approvedFrom.length; i++) {
-            if (airlines[account].approvedFrom[i] == from) {
+        for(uint i = 0; i < airlines[account].votedBy.length; i++) {
+            if (airlines[account].votedBy[i] == from) {
                 isDuplicate = true;
                 break;
             }
         }
         require(!isDuplicate, "Already approved from this airline");
 
-        airlines[account].approvedFrom.push(from);
+        airlines[account].votedBy.push(from);
     }
 
     function register(address account)
