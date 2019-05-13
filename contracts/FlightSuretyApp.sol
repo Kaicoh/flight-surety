@@ -2,8 +2,9 @@ pragma solidity ^0.5.2;
 
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./FlightSuretyData.sol";
+import "./Operationable.sol";
 
-contract FlightSuretyApp {
+contract FlightSuretyApp is Operationable {
     using SafeMath for uint;
 
     uint private constant REGISTERING_AIRLINE_WITHOUT_CONSENSUS = 4;
@@ -30,6 +31,7 @@ contract FlightSuretyApp {
 
     function registerAirline(address account, string memory name)
         public
+        requireIsOperational
         isRegisteredAirline
     {
         if (!flightSuretyData.isEntriedAirline(account)) {
@@ -45,7 +47,12 @@ contract FlightSuretyApp {
         }
     }
 
-    function fundAirline() public payable isRegisteredAirline {
+    function fundAirline()
+        public
+        payable
+        requireIsOperational
+        isRegisteredAirline
+    {
         uint deposit = flightSuretyData.fundAirline(msg.sender, msg.value);
         emit AirlineFunded(msg.sender, deposit);
     }
