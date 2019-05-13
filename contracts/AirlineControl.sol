@@ -66,7 +66,7 @@ contract AirlineControl {
         internal
         onlyBeforeEntry(account)
     {
-        Airline memory airline = Airline(name,Status.Entried, new address[](0), 0);
+        Airline memory airline = Airline(name, Status.Entried, new address[](0), 0);
         airlines[account] = airline;
     }
 
@@ -82,7 +82,7 @@ contract AirlineControl {
                 break;
             }
         }
-        require(!isDuplicate, "Already approved from this airline");
+        require(!isDuplicate, "Already voted from this airline");
 
         airlines[account].votedBy.push(from);
     }

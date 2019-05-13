@@ -24,7 +24,7 @@ contract('FlightSuretyApp', (accounts) => {
         instance = await FlightSuretyApp.deployed();
     });
 
-    it('register a new airline', async () => {
+    it('registers a new airline', async () => {
         const tx = await instance.registerAirline(airline2, '2nd airline', { from: airline1 });
         truffleAssert.eventEmitted(tx, 'AirlineRegistered', event => (
             event.account === airline2 && event.name === '2nd airline'
