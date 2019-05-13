@@ -68,8 +68,8 @@ contract('FlightSuretyApp', (accounts) => {
         ));
     });
 
-    it('registers 5th and subsequent airlines when approved by 50% of registered airlines', async () => {
-        // airline5 is approved by airline1 and airline2
+    it('registers 5th and subsequent airlines when voted by 50% of registered airlines', async () => {
+        // airline5 is voted by airline1 and airline2
         const tx = await instance.registerAirline(airline5, '5th airline', { from: airline2 });
         truffleAssert.eventEmitted(tx, 'AirlineRegistered', event => (
             event.account === airline5 && event.name === '5th airline'
@@ -96,7 +96,7 @@ contract('FlightSuretyApp', (accounts) => {
         ));
     });
 
-    it('does not register a new flight when inadequest funded airline', async () => {
+    it('does not register a new flight when inadequet funded airline', async () => {
         const flight = 'flight123';
         const timestamp = Date.parse('03 Jan 2009 00:00:00 GMT');
         try {
