@@ -1,20 +1,12 @@
 pragma solidity ^0.5.2;
 
-import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
-
 contract AirlineControl {
-    using SafeMath for uint;
-
-    mapping (address => Airline) private airlines;
-
-    uint public registeredCount = 0;
-    uint private constant CAN_REGISTER_WITHOUT_CONSENSUS = 4;
-    uint private constant DEPOSIT_THRESHOLD = 10 ether;
+    mapping (address => Airline) internal airlines;
 
     struct Airline {
         string name;
         Status status;
-        uint approved; // for multi-party consensus
+        address[] approvedFrom; // for multi-party consensus
         uint deposit;
     }
 
@@ -24,82 +16,89 @@ contract AirlineControl {
         Registered
     }
 
-    modifier isBeforeEntry(address _address) {
-        require(airlines[_address].status == Status.BeforeEntry, "Already entried");
+    uint internal registeredAirlineCount = 0;
+
+    modifier onlyBeforeEntry(address account) {
+        require(isBeforeEntry(account), "Airline must be BeforeEntry state");
         _;
     }
 
-    modifier isEntried(address _address) {
-        require(airlines[_address].status == Status.Entried, "Before entry or already registered");
+    modifier onlyEntried(address account) {
+        require(isEntried(account), "Airline must be Entried state");
         _;
     }
 
-    modifier isRegistered(address _address) {
-        require(airlines[_address].status == Status.Registered, "Not registered yet");
+    modifier onlyRegistered(address account) {
+        require(isRegistered(account), "Airline must be Registered state");
         _;
     }
 
-    modifier enoughDeposit(address _address) {
-        require(airlines[_address].deposit >= DEPOSIT_THRESHOLD, "Inadequate deposit");
-        _;
+    constructor(address account, string memory name) internal {
+        entry(account, name);
+        register(account);
     }
 
-    constructor(string memory _name) public {
-        // spec: First airline is registered when contract is deployed.
-        _entry(msg.sender, _name);
-        _register(msg.sender);
-    }
-
-    function registerAirline(address _address, string memory _name)
-        public
-        isRegistered(msg.sender)
+    function isBeforeEntry(address account)
+        internal
+        view
+        returns(bool)
     {
-        if (airlines[_address].status == Status.BeforeEntry) {
-            _entry(_address, _name);
-        }
+        return airlines[account].status == Status.BeforeEntry;
+    }
 
-        // spec: Only existing airline may register a new airline until there are at least four airlines registered
-        if (registeredCount < CAN_REGISTER_WITHOUT_CONSENSUS) {
-            _register(_address);
-        } else {
-            airlines[_address].approved++;
+    function isEntried(address account)
+        internal
+        view
+        returns(bool)
+    {
+        return airlines[account].status == Status.Entried;
+    }
 
-            // spec: Registration of fifth and subsequent airlines requires multi-party consensus of 50% of registered airlines
-            if (airlines[_address].approved >= registeredCount.div(2)) {
-                _register(_address);
+    function isRegistered(address account)
+        internal
+        view
+        returns(bool)
+    {
+        return airlines[account].status == Status.Registered;
+    }
+
+    function entry(address account, string memory name)
+        internal
+        onlyBeforeEntry(account)
+    {
+        Airline memory airline = Airline(name,Status.Entried, new address[](0), 0);
+        airlines[account] = airline;
+    }
+
+    function approve(address account, address from)
+        internal
+        onlyEntried(account)
+        onlyRegistered(from)
+    {
+        bool isDuplicate = false;
+        for(uint i = 0; i < airlines[account].approvedFrom.length; i++) {
+            if (airlines[account].approvedFrom[i] == from) {
+                isDuplicate = true;
+                break;
             }
         }
+        require(!isDuplicate, "Already approved from this airline");
+
+        airlines[account].approvedFrom.push(from);
     }
 
-    function deposit()
-        public
-        payable
-        isRegistered(msg.sender)
+    function register(address account)
+        internal
+        onlyEntried(account)
     {
-        airlines[msg.sender].deposit += msg.value;
+        airlines[account].status = Status.Registered;
+        registeredAirlineCount++;
     }
 
-    function canParticipate(address _address) public view returns(bool) {
-        return airlines[_address].deposit >= DEPOSIT_THRESHOLD;
-    }
-
-    function _entry(address _address, string memory _name)
-        private
-        isBeforeEntry(_address)
+    function fund(address account, uint amount)
+        internal
+        onlyRegistered(account)
     {
-        airlines[_address] = Airline({
-            name: _name,
-            status: Status.Entried,
-            approved: 0,
-            deposit: 0
-        });
-    }
-
-    function _register(address _address)
-        private
-        isEntried(_address)
-    {
-        airlines[_address].status = Status.Registered;
-        registeredCount++;
+        airlines[account].deposit += amount;
     }
 }
