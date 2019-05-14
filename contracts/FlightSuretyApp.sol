@@ -3,8 +3,9 @@ pragma solidity ^0.5.2;
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./FlightSuretyData.sol";
 import "./Operationable.sol";
+import "./OracleManager.sol";
 
-contract FlightSuretyApp is Operationable {
+contract FlightSuretyApp is Operationable, OracleManager {
     using SafeMath for uint;
 
     /********************************************************************************************/
@@ -14,6 +15,7 @@ contract FlightSuretyApp is Operationable {
     uint private constant REGISTERING_AIRLINE_WITHOUT_CONSENSUS = 4;
     uint private constant AIRLINE_DEPOSIT_THRESHOLD = 10 ether;
     uint private constant MAX_INSURANCE = 1 ether;
+    uint private constant MIN_ORACLE_RESPONSES = 3;
 
     FlightSuretyData flightSuretyData;
 
@@ -23,8 +25,12 @@ contract FlightSuretyApp is Operationable {
     event AirlineFunded(address indexed account, uint deposit);
 
     event FlightRegistered(address indexed airline, string flight, uint timestamp);
+    event FlightStatusInfo(address airline, string flight, uint timestamp, uint8 status);
 
     event BuyInsurance(address indexed account, uint amount , address airline, string flight, uint timestamp);
+
+    event OracleRequest(uint8 index, address airline, string flight, uint timestamp);
+    event OracleReport(address airline, string flight, uint timestamp, uint8 status);
 
     /********************************************************************************************/
     /*                                       FUNCTION MODIFIERS                                 */
@@ -108,6 +114,45 @@ contract FlightSuretyApp is Operationable {
         emit BuyInsurance(msg.sender, msg.value, airline, flight, timestamp);
     }
 
+    function fetchFlightStatus(address airline, string memory flight, uint timestamp)
+        public
+    {
+        uint8 index = getRandomIndex(msg.sender);
+        bytes32 key = _buildResponseKey(index, airline, flight, timestamp);
+
+        OracleManager.registerRequest(key, msg.sender);
+
+        emit OracleRequest(index, airline, flight, timestamp);
+    }
+
+    function submitOracleResponse(
+        uint8 index,
+        address airline,
+        string memory flight,
+        uint timestamp,
+        uint8 statusCode
+    )
+        public
+        isRegisteredOracle
+        isValidOracleIndex(index)
+    {
+        bytes32 key = _buildResponseKey(index, airline, flight, timestamp);
+        require(OracleManager.isRequestOpen(key), "Flight or timestamp do not match oracle request");
+
+        OracleManager.pushResponse(key, statusCode, msg.sender);
+        emit OracleReport(airline, flight, timestamp, statusCode);
+
+        if (OracleManager.getResponeCount(key, statusCode) >= MIN_ORACLE_RESPONSES) {
+
+            OracleManager.closeRequest(key);
+
+            bytes32 flightKey = _buildFlightKey(airline, flight, timestamp);
+            flightSuretyData.processFlightStatus(flightKey, statusCode);
+
+            emit FlightStatusInfo(airline, flight, timestamp, statusCode);
+        }
+    }
+
     /********************************************************************************************/
     /*                                     PRIVATE FUNCTIONS                                    */
     /********************************************************************************************/
@@ -145,6 +190,14 @@ contract FlightSuretyApp is Operationable {
         returns(bytes32)
     {
         return keccak256(abi.encodePacked(passenger, airline, flight, timestamp));
+    }
+
+    function _buildResponseKey(uint8 index, address airline, string memory flight, uint timestamp)
+        private
+        pure
+        returns(bytes32)
+    {
+        return keccak256(abi.encodePacked(index, airline, flight, timestamp));
     }
 
     /********************************************************************************************/

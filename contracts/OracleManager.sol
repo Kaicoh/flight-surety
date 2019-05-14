@@ -1,22 +1,27 @@
 pragma solidity ^0.5.2;
 
 contract OracleManager {
+
+    /********************************************************************************************/
+    /*                                       DATA VARIABLES                                     */
+    /********************************************************************************************/
+
     // Incremented to add pseudo-randomness at various points
     uint8 private nonce = 0;
 
     // Fee to be paid when registering oracle
     uint256 private constant REGISTRATION_FEE = 1 ether;
 
-    // Number of oracles that must respond for valid status
-    uint256 private constant MIN_RESPONSES = 3;
+    // Track all registered oracles
+    mapping(address => Oracle) private oracles;
+
+    // Track all oracle responses
+    mapping (bytes32 => ResponseInfo) private oracleResponses;
 
     struct Oracle {
         bool isRegistered;
         uint8[3] indexes;
     }
-
-    // Track all registered oracles
-    mapping(address => Oracle) private oracles;
 
     // Model for responses from oracles
     struct ResponseInfo {
@@ -25,9 +30,28 @@ contract OracleManager {
         mapping (uint8 => address[]) responses;
     }
 
-    // Track all oracle responses
-    // Key = hash(index, flight, timestamp)
-    mapping (bytes32 => ResponseInfo) internal oracleResponses;
+    event OracleRegistered(address acount, uint8[3] indexes);
+
+    /********************************************************************************************/
+    /*                                       FUNCTION MODIFIERS                                 */
+    /********************************************************************************************/
+
+    modifier isRegisteredOracle() {
+        require(oracles[msg.sender].isRegistered, "Not registered oracle");
+        _;
+    }
+
+    modifier isValidOracleIndex(uint8 index) {
+        require(
+            (oracles[msg.sender].indexes[0] == index) || (oracles[msg.sender].indexes[1] == index) || (oracles[msg.sender].indexes[2] == index),
+            "Index does not match oracle request"
+        );
+        _;
+    }
+
+    /********************************************************************************************/
+    /*                                     SMART CONTRACT FUNCTIONS                             */
+    /********************************************************************************************/
 
     // Register an oracle with the contract
     function registerOracle() external payable {
@@ -40,12 +64,52 @@ contract OracleManager {
             isRegistered: true,
             indexes: indexes
         });
+
+        emit OracleRegistered(msg.sender, indexes);
     }
 
-    function getMyIndexes() external view returns(uint8[3] memory) {
+    function getOracleIndexes() external view returns(uint8[3] memory) {
         require(oracles[msg.sender].isRegistered, "Not registered as an oracle");
         return oracles[msg.sender].indexes;
     }
+
+    function registerRequest(bytes32 key, address requester) internal {
+        oracleResponses[key] = ResponseInfo({
+            requester: requester,
+            isOpen: true
+        });
+    }
+
+    function isRequestOpen(bytes32 key) internal view returns(bool) {
+        return oracleResponses[key].isOpen;
+    }
+
+    function pushResponse(bytes32 key, uint8 statusCode, address account) internal {
+        address[] memory addresses = oracleResponses[key].responses[statusCode];
+
+        bool isDuplicate = false;
+        for(uint i = 0; i < addresses.length; i++) {
+            if (addresses[i] == account) {
+                isDuplicate = true;
+                break;
+            }
+        }
+        require(!isDuplicate, "Already registered this response");
+
+        oracleResponses[key].responses[statusCode].push(account);
+    }
+
+    function getResponeCount(bytes32 key, uint8 statusCode) internal view returns(uint) {
+        return oracleResponses[key].responses[statusCode].length;
+    }
+
+    function closeRequest(bytes32 key) internal {
+        oracleResponses[key].isOpen = false;
+    }
+
+    /********************************************************************************************/
+    /*                                       UTILITY FUNCTIONS                                  */
+    /********************************************************************************************/
 
     // Returns array of three non-duplicating integers from 0-9
     function generateIndexes(address account)

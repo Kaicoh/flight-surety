@@ -115,6 +115,13 @@ contract FlightSuretyData is Authorizable, AirlineControl, FlightControl, Insure
         return FlightControl.isRegistered(flightKey);
     }
 
+    function processFlightStatus(bytes32 flightKey, uint8 statusCode)
+        external
+        onlyAuthorizedContract
+    {
+        FlightControl.changeStatus(flightKey, statusCode);
+    }
+
     /* Insurance */
     function buyInsurance(bytes32 insuranceKey, uint amount)
         external
