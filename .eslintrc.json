@@ -13,6 +13,10 @@
         "ecmaVersion": 2018
     },
     "rules": {
-        "indent": ["error", 4]
+        "indent": ["error", 4],
+        "import/no-extraneous-dependencies": ["error", {
+            "devDependencies": ["truffle.js", "test/**/*.js"],
+            "peerDependencies": false
+        }]
     }
 }
