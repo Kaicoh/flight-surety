@@ -17,7 +17,7 @@ contract('FlightSuretyApp', (accounts) => {
         passenger2,
     ] = accounts;
 
-    const oracles = MockOracle.build(accounts.slice(10, 30));
+    const oracles = MockOracle.build(accounts.slice(10, 20));
 
     const testFlight = {
         flightNumber: 'TEST123',
@@ -173,25 +173,6 @@ contract('FlightSuretyApp', (accounts) => {
                 && event.timestamp.toNumber() === timestamp
             );
         });
-    });
-
-    it('refuses not registered oracle', async () => {
-        const { flightNumber, timestamp } = testFlight;
-        const statusCode = 30;
-
-        try {
-            await instance.submitOracleResponse(
-                requestIndex,
-                airline1,
-                flightNumber,
-                timestamp,
-                statusCode,
-                { from: airline1 },
-            );
-            throw new Error('unreachable error');
-        } catch (error) {
-            assert.match(error.message, /Not registered oracle/);
-        }
     });
 
     it('can accept response from oracles', async () => {
