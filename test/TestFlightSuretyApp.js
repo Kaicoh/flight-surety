@@ -125,6 +125,7 @@ contract('FlightSuretyApp', (accounts) => {
                 from: passenger2,
                 value: web3.utils.toWei('2', 'ether'),
             });
+            throw new Error('unreachable error');
         } catch (error) {
             assert.match(error.message, /Up to 1 ether for purchasing flight insurance/);
         }
