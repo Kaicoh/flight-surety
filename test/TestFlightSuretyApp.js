@@ -6,6 +6,7 @@ const MockOracle = require('../utils/mockOracle');
 contract('FlightSuretyApp', (accounts) => {
     let instance;
     let requestIndex;
+    let canPayout = false;
 
     const [
         airline1,
@@ -17,7 +18,10 @@ contract('FlightSuretyApp', (accounts) => {
         passenger2,
     ] = accounts;
 
-    const oracles = MockOracle.build(accounts.slice(10, 20));
+    const credit = web3.utils.toWei('1', 'ether');
+    const expectedPayout = web3.utils.toWei('1.5', 'ether');
+
+    const oracles = MockOracle.build(accounts.slice(10, 30));
 
     const testFlight = {
         flightNumber: 'TEST123',
@@ -109,7 +113,7 @@ contract('FlightSuretyApp', (accounts) => {
         const { flightNumber, timestamp } = testFlight;
         const tx = await instance.buyInsurance(airline1, flightNumber, timestamp, {
             from: passenger1,
-            value: web3.utils.toWei('1', 'ether'),
+            value: credit,
         });
         truffleAssert.eventEmitted(tx, 'BuyInsurance', (event) => {
             const amount = web3.utils.fromWei(event.amount.toString(), 'ether');
@@ -177,7 +181,7 @@ contract('FlightSuretyApp', (accounts) => {
 
     it('can accept response from oracles', async () => {
         const { flightNumber, timestamp } = testFlight;
-        const statusCode = 30;
+        const statusCode = 20;
         let submitCount = 0;
 
         for (let i = 0; i < oracles.length; i += 1) {
@@ -205,10 +209,37 @@ contract('FlightSuretyApp', (accounts) => {
                         && event.timestamp.toNumber() === timestamp
                         && event.status.toNumber() === statusCode
                     ));
+
+                    canPayout = true;
                 }
 
                 submitCount += 1;
             }
+        }
+    });
+
+    it('can payout insurance', async () => {
+        if (canPayout) {
+            console.log('execute payout test'); // eslint-disable-line no-console
+            const { flightNumber, timestamp } = testFlight;
+
+            const balanceBefore = await web3.eth.getBalance(passenger1);
+
+            await instance.payoutInsurance(
+                airline1,
+                flightNumber,
+                timestamp,
+                { from: passenger1, gasPrice: 0 },
+            );
+
+            const balanceAfter = await web3.eth.getBalance(passenger1);
+
+            assert.equal(
+                Number(balanceAfter) - Number(balanceBefore),
+                Number(expectedPayout),
+            );
+        } else {
+            console.log('skip payout test'); // eslint-disable-line no-console
         }
     });
 });

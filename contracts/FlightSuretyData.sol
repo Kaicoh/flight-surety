@@ -115,6 +115,15 @@ contract FlightSuretyData is Authorizable, AirlineControl, FlightControl, Insure
         return FlightControl.isRegistered(flightKey);
     }
 
+    function isFlightToPayout(bytes32 flightKey)
+        external
+        view
+        onlyAuthorizedContract
+        returns(bool)
+    {
+        return FlightControl.isStatusToPayout(flightKey);
+    }
+
     function processFlightStatus(bytes32 flightKey, uint8 statusCode)
         external
         onlyAuthorizedContract
@@ -129,5 +138,14 @@ contract FlightSuretyData is Authorizable, AirlineControl, FlightControl, Insure
         onlyAuthorizedContract
     {
         Insuree.register(insuranceKey, amount);
+    }
+
+    function payoutInsurance(bytes32 insuranceKey)
+        external
+        requireIsOperational
+        onlyAuthorizedContract
+        returns(uint)
+    {
+        return Insuree.payout(insuranceKey);
     }
 }

@@ -56,4 +56,16 @@ contract FlightControl {
             statusCode == STATUS_CODE_LATE_OTHER
         );
     }
+
+    function isStatusToPayout(bytes32 flightKey)
+        internal
+        view
+        returns(bool)
+    {
+        uint8 statusCode = flights[flightKey].status;
+        return (
+            statusCode == STATUS_CODE_LATE_AIRLINE ||
+            statusCode == STATUS_CODE_LATE_TECHNICAL
+        );
+    }
 }

@@ -114,6 +114,19 @@ contract FlightSuretyApp is Operationable, OracleManager {
         emit BuyInsurance(msg.sender, msg.value, airline, flight, timestamp);
     }
 
+    function payoutInsurance(address airline, string memory flight, uint timestamp)
+        public
+        requireIsOperational
+    {
+        bytes32 flightKey = _buildFlightKey(airline, flight, timestamp);
+        require(flightSuretyData.isFlightToPayout(flightKey), "Not a flight to payout");
+
+        bytes32 insuranceKey = _buildInsuranceKey(msg.sender, airline, flight, timestamp);
+        uint credit = flightSuretyData.payoutInsurance(insuranceKey);
+        uint payoutAmount = credit.mul(3).div(2);
+        msg.sender.transfer(payoutAmount);
+    }
+
     function fetchFlightStatus(address airline, string memory flight, uint timestamp)
         public
     {
