@@ -198,7 +198,7 @@ contract('FlightSuretyApp', (accounts) => {
                     && event.status.toNumber() === statusCode
                 ));
 
-                if (i === 2) {
+                if (submitCount === 2) {
                     truffleAssert.eventEmitted(tx, 'FlightStatusInfo', event => (
                         event.airline === airline1
                         && event.flight === flightNumber

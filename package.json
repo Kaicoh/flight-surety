@@ -12,13 +12,12 @@
     "test": "yarn run compile && yarn run migrate && truffle test",
     "compile": "rimraf ./build && truffle compile",
     "migrate": "truffle migrate --reset",
-    "ganache": "dotenv ./scripts/ganache.sh",
+    "ganache": "ganache-cli -a 30",
     "eslint": "eslint migrations/**/*.js test/**/*.js truffle.js",
     "solium": "solium -d contracts",
     "lint": "yarn run eslint && yarn run solium"
   },
   "devDependencies": {
-    "dotenv-cli": "^2.0.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
