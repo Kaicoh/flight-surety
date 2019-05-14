@@ -18,7 +18,6 @@
     "lint": "yarn run eslint && yarn run solium"
   },
   "devDependencies": {
-    "dotenv": "^8.0.0",
     "dotenv-cli": "^2.0.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
@@ -29,7 +28,6 @@
     "rimraf": "^2.6.3",
     "truffle": "^5.0.17",
     "truffle-assertions": "^0.8.2",
-    "truffle-hdwallet-provider": "1.0.6",
     "web3": "1.0.0-beta.55"
   }
 }
