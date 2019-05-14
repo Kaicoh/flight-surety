@@ -4,7 +4,6 @@ contract AirlineControl {
     mapping (address => Airline) internal airlines;
 
     struct Airline {
-        string name;
         AirlineStatus status;
         address[] votedBy; // for multi-party consensus
         uint deposit;
@@ -57,11 +56,11 @@ contract AirlineControl {
         return airlines[account].status == AirlineStatus.Registered;
     }
 
-    function entry(address account, string memory name)
+    function entry(address account)
         internal
         onlyBeforeEntry(account)
     {
-        Airline memory airline = Airline(name, AirlineStatus.Entried, new address[](0), 0);
+        Airline memory airline = Airline(AirlineStatus.Entried, new address[](0), 0);
         airlines[account] = airline;
     }
 

@@ -3,14 +3,26 @@ pragma solidity ^0.5.2;
 import "./Authorizable.sol";
 import "./AirlineControl.sol";
 import "./FlightControl.sol";
+import "./Insuree.sol";
 import "./Operationable.sol";
 
-contract FlightSuretyData is Authorizable, AirlineControl, FlightControl, Operationable {
-    constructor(string memory name) Authorizable() public {
+contract FlightSuretyData is Authorizable, AirlineControl, FlightControl, Insuree, Operationable {
+
+    /********************************************************************************************/
+    /*                                       CONSTRUCTOR                                        */
+    /********************************************************************************************/
+
+    constructor() Authorizable() public {
         // First airline is registered when contract is deployed
-        AirlineControl.entry(msg.sender, name);
+        AirlineControl.entry(msg.sender);
         AirlineControl.register(msg.sender);
     }
+
+    /********************************************************************************************/
+    /*                                     SMART CONTRACT FUNCTIONS                             */
+    /********************************************************************************************/
+
+    /* Airlines */
 
     function registeredAirlinesCount()
         external
@@ -48,12 +60,12 @@ contract FlightSuretyData is Authorizable, AirlineControl, FlightControl, Operat
         return airlines[account].deposit;
     }
 
-    function entryAirline(address account, string calldata name)
+    function entryAirline(address account)
         external
         requireIsOperational
         onlyAuthorizedContract
     {
-        AirlineControl.entry(account, name);
+        AirlineControl.entry(account);
     }
 
     function registerAirline(address account)
@@ -84,11 +96,31 @@ contract FlightSuretyData is Authorizable, AirlineControl, FlightControl, Operat
         return airlines[account].deposit;
     }
 
-    function registerFlight(address account, string calldata flight, uint timestamp)
+    /* Flights */
+
+    function registerFlight(bytes32 flightKey)
         external
         requireIsOperational
         onlyAuthorizedContract
     {
-        FlightControl.register(account, flight, timestamp);
+        FlightControl.register(flightKey);
+    }
+
+    function isFlightRegistered(bytes32 flightKey)
+        external
+        view
+        onlyAuthorizedContract
+        returns(bool)
+    {
+        return FlightControl.isRegistered(flightKey);
+    }
+
+    /* Insurance */
+    function buyInsurance(bytes32 insuranceKey, uint amount)
+        external
+        requireIsOperational
+        onlyAuthorizedContract
+    {
+        Insuree.register(insuranceKey, amount);
     }
 }

@@ -7,7 +7,6 @@ contract FlightControl {
         bool isRegistered;
         FlightStatus status;
         uint updatedTimestamp;
-        address airline;
     }
 
     enum FlightStatus {
@@ -16,20 +15,19 @@ contract FlightControl {
         Delayed
     }
 
-    function register(address airline, string memory flight, uint timestamp)
+    function register(bytes32 flightKey)
         internal
     {
         // solium-disable-next-line security/no-block-members
-        Flight memory newFlight = Flight(true, FlightStatus.Unknown, now, airline);
-        bytes32 key = buildFlightKey(airline, flight, timestamp);
-        flights[key] = newFlight;
+        Flight memory newFlight = Flight(true, FlightStatus.Unknown, now);
+        flights[flightKey] = newFlight;
     }
 
-    function buildFlightKey(address airline, string memory flight, uint timestamp)
-        private
-        pure
-        returns(bytes32)
+    function isRegistered(bytes32 flightKey)
+        internal
+        view
+        returns(bool)
     {
-        return keccak256(abi.encodePacked(airline, flight, timestamp));
+        return flights[flightKey].isRegistered;
     }
 }
