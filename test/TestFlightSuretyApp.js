@@ -1,9 +1,11 @@
 const FlightSuretyApp = artifacts.require('FlightSuretyApp');
 const FlightSuretyData = artifacts.require('FlightSuretyData');
 const truffleAssert = require('truffle-assertions');
+const MockOracle = require('../utils/mockOracle');
 
 contract('FlightSuretyApp', (accounts) => {
     let instance;
+    let requestIndex;
 
     const [
         airline1,
@@ -15,12 +17,15 @@ contract('FlightSuretyApp', (accounts) => {
         passenger2,
     ] = accounts;
 
+    const oracles = MockOracle.build(accounts.slice(10, 30));
+
     const testFlight = {
         flightNumber: 'TEST123',
         timestamp: Date.parse('03 Jan 2009 00:09:00 GMT'),
     };
 
     before(async () => {
+        // authorize FlightSuretyApp contract
         const appContract = await FlightSuretyApp.deployed();
         const dataContract = await FlightSuretyData.deployed();
         await dataContract.authorizeContract(appContract.address, { from: accounts[0] });
@@ -128,6 +133,101 @@ contract('FlightSuretyApp', (accounts) => {
             throw new Error('unreachable error');
         } catch (error) {
             assert.match(error.message, /Up to 1 ether for purchasing flight insurance/);
+        }
+    });
+
+    it('can register oracles', async () => {
+        const fee = web3.utils.toWei('1', 'ether');
+
+        for (let i = 0; i < oracles.length; i += 1) {
+            const oracle = oracles[i];
+            // eslint-disable-next-line no-await-in-loop
+            const tx = await instance.registerOracle({ from: oracle.address, value: fee });
+            truffleAssert.eventEmitted(tx, 'OracleRegistered', event => event.account === oracle.address);
+        }
+    });
+
+    it('can get oracle indexes', async () => {
+        for (let i = 0; i < oracles.length; i += 1) {
+            const oracle = oracles[i];
+            // eslint-disable-next-line no-await-in-loop
+            const indexes = await instance.getOracleIndexes({ from: oracle.address });
+            oracle.indexes = indexes.map(index => index.toNumber());
+            assert.equal(indexes.length, 3);
+        }
+    });
+
+    it('can emit request to oracles', async () => {
+        const { flightNumber, timestamp } = testFlight;
+        const tx = await instance.fetchFlightStatus(
+            airline1,
+            flightNumber,
+            timestamp,
+            { from: passenger1 },
+        );
+        truffleAssert.eventEmitted(tx, 'OracleRequest', (event) => {
+            requestIndex = event.index.toNumber();
+            return (
+                event.airline === airline1
+                && event.flight === flightNumber
+                && event.timestamp.toNumber() === timestamp
+            );
+        });
+    });
+
+    it('refuses not registered oracle', async () => {
+        const { flightNumber, timestamp } = testFlight;
+        const statusCode = 30;
+
+        try {
+            await instance.submitOracleResponse(
+                requestIndex,
+                airline1,
+                flightNumber,
+                timestamp,
+                statusCode,
+                { from: airline1 },
+            );
+            throw new Error('unreachable error');
+        } catch (error) {
+            assert.match(error.message, /Not registered oracle/);
+        }
+    });
+
+    it('can accept response from oracles', async () => {
+        const { flightNumber, timestamp } = testFlight;
+        const statusCode = 30;
+        let submitCount = 0;
+
+        for (let i = 0; i < oracles.length; i += 1) {
+            if (submitCount <= 2 && oracles[i].hasIndex(requestIndex)) {
+                // eslint-disable-next-line no-await-in-loop
+                const tx = await instance.submitOracleResponse(
+                    requestIndex,
+                    airline1,
+                    flightNumber,
+                    timestamp,
+                    statusCode,
+                    { from: oracles[i].address },
+                );
+                truffleAssert.eventEmitted(tx, 'OracleReport', event => (
+                    event.airline === airline1
+                    && event.flight === flightNumber
+                    && event.timestamp.toNumber() === timestamp
+                    && event.status.toNumber() === statusCode
+                ));
+
+                if (i === 2) {
+                    truffleAssert.eventEmitted(tx, 'FlightStatusInfo', event => (
+                        event.airline === airline1
+                        && event.flight === flightNumber
+                        && event.timestamp.toNumber() === timestamp
+                        && event.status.toNumber() === statusCode
+                    ));
+                }
+
+                submitCount += 1;
+            }
         }
     });
 });
