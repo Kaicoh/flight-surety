@@ -1,5 +1,4 @@
 const FlightSuretyApp = artifacts.require('FlightSuretyApp');
-const FlightSuretyData = artifacts.require('FlightSuretyData');
 const truffleAssert = require('truffle-assertions');
 const MockOracle = require('../utils/mockOracle');
 
@@ -27,13 +26,6 @@ contract('FlightSuretyApp', (accounts) => {
         flightNumber: 'TEST123',
         timestamp: Date.parse('03 Jan 2009 00:09:00 GMT'),
     };
-
-    before(async () => {
-        // authorize FlightSuretyApp contract
-        const appContract = await FlightSuretyApp.deployed();
-        const dataContract = await FlightSuretyData.deployed();
-        await dataContract.authorizeContract(appContract.address, { from: accounts[0] });
-    });
 
     beforeEach(async () => {
         instance = await FlightSuretyApp.deployed();
