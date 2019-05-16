@@ -11,9 +11,9 @@
   "scripts": {
     "dapp": "webpack-dev-server --open",
     "test": "yarn run compile && yarn run migrate && truffle test",
-    "compile": "rimraf ./build && truffle compile",
+    "compile": "rimraf ./src/contracts && truffle compile",
     "migrate": "truffle migrate --reset",
-    "ganache": "ganache-cli -a 30",
+    "ganache": "dotenv ./start_ganache.sh",
     "eslint": "eslint migrations/**/*.js test/**/*.js truffle.js",
     "solium": "solium -d contracts",
     "lint": "yarn run eslint && yarn run solium"
@@ -25,6 +25,7 @@
     "babel-loader": "^8.0.6",
     "clean-webpack-plugin": "^2.0.2",
     "css-loader": "^2.1.1",
+    "dotenv-cli": "^2.0.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-config-airbnb-base": "^13.1.0",
@@ -44,6 +45,8 @@
     "webpack-dev-server": "^3.3.1"
   },
   "dependencies": {
+    "bootstrap": "^4.3.1",
+    "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "web3": "^1.0.0-beta.55"
