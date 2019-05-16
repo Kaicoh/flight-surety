@@ -1,10 +1,14 @@
 import PropTypes from 'prop-types';
+import Web3 from 'web3';
 
-const contractProps = PropTypes.shape({
+export const web3PropType = PropTypes.instanceOf(Web3);
+
+export const contractPropType = PropTypes.shape({
     methods: PropTypes.shape({
         // Airline methods
         registerAirline: PropTypes.func.isRequired,
         fundAirline: PropTypes.func.isRequired,
+        fundedEnough: PropTypes.func.isRequired,
 
         // Flight methods
         registerFlight: PropTypes.func.isRequired,
@@ -16,4 +20,4 @@ const contractProps = PropTypes.shape({
     }).isRequired,
 });
 
-export default contractProps;
+export const accountPropType = PropTypes.string;

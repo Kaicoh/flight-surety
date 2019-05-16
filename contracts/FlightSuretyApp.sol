@@ -84,18 +84,24 @@ contract FlightSuretyApp is Operationable, OracleManager {
         emit AirlineFunded(msg.sender, deposit);
     }
 
+    function fundedEnough(address account)
+        public
+        view
+        returns(bool)
+    {
+        return flightSuretyData.getDeposit(account) >= AIRLINE_DEPOSIT_THRESHOLD;
+    }
+
     function registerFlight(string memory flight, uint timestamp)
         public
         requireIsOperational
         isRegisteredAirline
     {
-        require(
-            flightSuretyData.getDeposit(msg.sender) >= AIRLINE_DEPOSIT_THRESHOLD,
-            "Deposit is inadequet"
-        );
+        require(fundedEnough(msg.sender), "Deposit is inadequet");
 
         bytes32 flightKey = _buildFlightKey(msg.sender, flight, timestamp);
         flightSuretyData.registerFlight(flightKey);
+
         emit FlightRegistered(msg.sender, flight, timestamp);
     }
 
