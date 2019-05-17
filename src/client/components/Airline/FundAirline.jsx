@@ -1,4 +1,5 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { Fragment } from 'react';
+import useFundingAirline from '../../hooks/useFundingAirline';
 import {
     web3PropType,
     contractPropType,
@@ -7,33 +8,7 @@ import {
 
 // eslint-disable-next-line object-curly-newline
 const FundAirline = ({ web3, contract, account }) => {
-    const [funded, setFunded] = useState(false);
-
-    const fund = () => {
-        contract.methods.fundAirline()
-            .send({ from: account, value: web3.utils.toWei('10', 'ether') })
-            .catch(console.error); // eslint-disable-line no-console
-    };
-
-    const queryFundingStatus = () => {
-        contract.methods.fundedEnough(account).call()
-            .then((state) => {
-                setFunded(state);
-            })
-            .catch(console.error); // eslint-disable-line no-console
-    };
-
-    useEffect(queryFundingStatus, []);
-
-    useEffect(() => {
-        contract.events.AirlineFunded({ filter: { account } }, (error) => {
-            if (error) {
-                console.error(error); // eslint-disable-line no-console
-                return;
-            }
-            queryFundingStatus();
-        });
-    }, []);
+    const [funded, fund] = useFundingAirline(web3, contract, account);
 
     return (
         <div>
