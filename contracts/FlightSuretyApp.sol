@@ -24,13 +24,13 @@ contract FlightSuretyApp is Operationable, OracleManager {
     event AirlineRegistered(address indexed account);
     event AirlineFunded(address indexed account, uint deposit);
 
-    event FlightRegistered(address indexed airline, string flight, uint timestamp);
-    event FlightStatusInfo(address airline, string flight, uint timestamp, uint8 status);
+    event FlightRegistered(string indexed flight, uint indexed timestamp, address airline);
+    event FlightStatusInfo(string indexed flight, uint indexed timestamp, uint8 status);
 
-    event BuyInsurance(address indexed account, uint amount , address airline, string flight, uint timestamp);
+    event BuyInsurance(address indexed account, string indexed flight, uint indexed timestamp, uint amount);
 
-    event OracleRequest(uint8 index, address airline, string flight, uint timestamp);
-    event OracleReport(address airline, string flight, uint timestamp, uint8 status);
+    event OracleRequest(string indexed flight, uint indexed timestamp, uint8 indexed index);
+    event OracleReport(string indexed flight, uint indexed timestamp, uint8 status);
 
     /********************************************************************************************/
     /*                                       FUNCTION MODIFIERS                                 */
@@ -102,7 +102,7 @@ contract FlightSuretyApp is Operationable, OracleManager {
         bytes32 flightKey = _buildFlightKey(msg.sender, flight, timestamp);
         flightSuretyData.registerFlight(flightKey);
 
-        emit FlightRegistered(msg.sender, flight, timestamp);
+        emit FlightRegistered(flight, timestamp, msg.sender);
     }
 
     function buyInsurance(address airline, string memory flight, uint timestamp)
@@ -117,7 +117,7 @@ contract FlightSuretyApp is Operationable, OracleManager {
 
         bytes32 insuranceKey = _buildInsuranceKey(msg.sender, airline, flight, timestamp);
         flightSuretyData.buyInsurance(insuranceKey, msg.value);
-        emit BuyInsurance(msg.sender, msg.value, airline, flight, timestamp);
+        emit BuyInsurance(msg.sender, flight, timestamp, msg.value);
     }
 
     function payoutInsurance(address airline, string memory flight, uint timestamp)
@@ -141,7 +141,7 @@ contract FlightSuretyApp is Operationable, OracleManager {
 
         OracleManager.registerRequest(key, msg.sender);
 
-        emit OracleRequest(index, airline, flight, timestamp);
+        emit OracleRequest(flight, timestamp, index);
     }
 
     function submitOracleResponse(
@@ -159,7 +159,7 @@ contract FlightSuretyApp is Operationable, OracleManager {
         require(OracleManager.isRequestOpen(key), "Flight or timestamp do not match oracle request");
 
         OracleManager.pushResponse(key, statusCode, msg.sender);
-        emit OracleReport(airline, flight, timestamp, statusCode);
+        emit OracleReport(flight, timestamp, statusCode);
 
         if (OracleManager.getResponeCount(key, statusCode) >= MIN_ORACLE_RESPONSES) {
 
@@ -168,7 +168,7 @@ contract FlightSuretyApp is Operationable, OracleManager {
             bytes32 flightKey = _buildFlightKey(airline, flight, timestamp);
             flightSuretyData.processFlightStatus(flightKey, statusCode);
 
-            emit FlightStatusInfo(airline, flight, timestamp, statusCode);
+            emit FlightStatusInfo(flight, timestamp, statusCode);
         }
     }
 
