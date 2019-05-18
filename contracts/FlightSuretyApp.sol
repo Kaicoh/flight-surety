@@ -24,13 +24,13 @@ contract FlightSuretyApp is Operationable, OracleManager {
     event AirlineRegistered(address indexed account);
     event AirlineFunded(address indexed account, uint deposit);
 
-    event FlightRegistered(string indexed flight, uint indexed timestamp, address airline);
-    event FlightStatusInfo(string indexed flight, uint indexed timestamp, uint8 status);
+    event FlightRegistered(string flight, uint timestamp, address airline);
+    event FlightStatusInfo(string flight, uint timestamp, uint8 status);
 
-    event BuyInsurance(address indexed account, string indexed flight, uint indexed timestamp, uint amount);
+    event BuyInsurance(address indexed account, string flight, uint timestamp, uint amount);
 
-    event OracleRequest(string indexed flight, uint indexed timestamp, uint8 indexed index);
-    event OracleReport(string indexed flight, uint indexed timestamp, uint8 status);
+    event OracleRequest(string flight, uint timestamp, uint8 index);
+    event OracleReport(string flight, uint timestamp, uint8 status);
 
     /********************************************************************************************/
     /*                                       FUNCTION MODIFIERS                                 */

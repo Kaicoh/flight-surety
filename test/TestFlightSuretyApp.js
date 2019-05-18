@@ -111,7 +111,6 @@ contract('FlightSuretyApp', (accounts) => {
             const amount = web3.utils.fromWei(event.amount.toString(), 'ether');
             return (
                 event.account === passenger1
-                && event.airline === airline1
                 && event.flight === flightNumber
                 && event.timestamp.toNumber() === timestamp
                 && amount === '1'
@@ -164,8 +163,7 @@ contract('FlightSuretyApp', (accounts) => {
         truffleAssert.eventEmitted(tx, 'OracleRequest', (event) => {
             requestIndex = event.index.toNumber();
             return (
-                event.airline === airline1
-                && event.flight === flightNumber
+                event.flight === flightNumber
                 && event.timestamp.toNumber() === timestamp
             );
         });
@@ -188,16 +186,14 @@ contract('FlightSuretyApp', (accounts) => {
                     { from: oracles[i].address },
                 );
                 truffleAssert.eventEmitted(tx, 'OracleReport', event => (
-                    event.airline === airline1
-                    && event.flight === flightNumber
+                    event.flight === flightNumber
                     && event.timestamp.toNumber() === timestamp
                     && event.status.toNumber() === statusCode
                 ));
 
                 if (submitCount === 2) {
                     truffleAssert.eventEmitted(tx, 'FlightStatusInfo', event => (
-                        event.airline === airline1
-                        && event.flight === flightNumber
+                        event.flight === flightNumber
                         && event.timestamp.toNumber() === timestamp
                         && event.status.toNumber() === statusCode
                     ));
