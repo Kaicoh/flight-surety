@@ -21,3 +21,10 @@ export const contractPropType = PropTypes.shape({
 });
 
 export const accountPropType = PropTypes.string;
+
+export const flightPropType = PropTypes.shape({
+    number: PropTypes.string.isRequired,
+    timestamp: PropTypes.number.isRequired,
+    airline: PropTypes.string.isRequired,
+    status: PropTypes.number.isRequired,
+});

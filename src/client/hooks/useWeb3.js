@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Web3 from 'web3';
 import FlightSuretyApp from '../../contracts/FlightSuretyApp.json';
 
-const useContract = () => {
+const useWeb3 = () => {
     const [web3, setWeb3] = useState(null);
     const [contract, setContract] = useState(null);
     const [account, setAccount] = useState(null);
@@ -45,4 +45,4 @@ const useContract = () => {
     return [web3, contract, account];
 };
 
-export default useContract;
+export default useWeb3;

@@ -1,10 +1,35 @@
-import React, { Fragment } from 'react';
-import useEthereum from './hooks/useEthereum';
+import React, { Fragment, useEffect } from 'react';
+import useWeb3 from './hooks/useWeb3';
+import useFlights from './hooks/useFlights';
 import Airline from './components/Airline';
-import FlightTable from './components/FlightTable';
 
 const App = () => {
-    const [web3, contract, account] = useEthereum();
+    const [web3, contract, account] = useWeb3();
+    const [flights, setAirline, setStatus] = useFlights();
+
+    const options = { fromBlock: 0 };
+
+    useEffect(() => {
+        if (contract) {
+            contract.events.FlightRegistered(options, (error, event) => {
+                if (error) {
+                    console.error(error); // eslint-disable-line no-console
+                    return;
+                }
+                const { returnValues: { flight, timestamp, airline } } = event;
+                setAirline(flight, timestamp.toNumber(), airline);
+            });
+
+            contract.events.FlightStatusInfo(options, (error, event) => {
+                if (error) {
+                    console.error(error); // eslint-disable-line no-console
+                    return;
+                }
+                const { returnValues: { flight, timestamp, status } } = event;
+                setStatus(flight, timestamp.toNumber(), status);
+            });
+        }
+    }, [contract]);
 
     return (
         <div className="container d-flex flex-column">
@@ -15,11 +40,7 @@ const App = () => {
                         web3={web3}
                         contract={contract}
                         account={account}
-                    />
-                    <FlightTable
-                        contract={contract}
-                        account={account}
-                        containerClass="mt-3"
+                        flights={flights}
                     />
                 </Fragment>
             ) : (

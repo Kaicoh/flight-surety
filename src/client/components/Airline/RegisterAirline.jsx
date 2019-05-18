@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
     contractPropType,
     accountPropType,
-} from '../../utils/ethereumPropTypes';
+} from '../../utils/propTypes';
 
 const RegisterAirline = ({ contract, account }) => {
     const [address, setAddress] = useState('');
