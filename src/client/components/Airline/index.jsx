@@ -13,7 +13,6 @@ import {
 // eslint-disable-next-line object-curly-newline
 const Airline = ({ web3, contract, account, flights, containerClass }) => (
     <div className={containerClass}>
-        <h2>Airline Section</h2>
         <div className="row">
             <div className="col">
                 <FundAirline

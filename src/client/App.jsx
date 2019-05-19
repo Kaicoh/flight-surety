@@ -1,8 +1,7 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import useWeb3 from './hooks/useWeb3';
 import useFlights from './hooks/useFlights';
-import Airline from './components/Airline';
-import Passenger from './components/Passenger';
+import Layout from './components/Layout';
 
 const App = () => {
     const [web3, contract, account] = useWeb3();
@@ -36,20 +35,12 @@ const App = () => {
         <div className="container d-flex flex-column">
             <h1 className="flex-grow-0">Flight Surety Dapp</h1>
             {web3 && contract && account ? (
-                <Fragment>
-                    <Airline
-                        web3={web3}
-                        contract={contract}
-                        account={account}
-                        flights={flights}
-                    />
-                    <Passenger
-                        web3={web3}
-                        contract={contract}
-                        account={account}
-                        flights={flights}
-                    />
-                </Fragment>
+                <Layout
+                    web3={web3}
+                    contract={contract}
+                    account={account}
+                    flights={flights}
+                />
             ) : (
                 <div className="row justify-content-center align-items-center flex-grow-1">
                     <div className="spinner-border text-primary" role="status">

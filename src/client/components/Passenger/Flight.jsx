@@ -17,13 +17,15 @@ const Flight = ({ row, flight, buyInsurance, fetchStatus, withdrawal }) => {
             <td>{number}</td>
             <td>{format.date(new Date(timestamp))}</td>
             <td>
-                {format.flightStatus(status)}
+                <span className="mr-2">
+                    {format.flightStatus(status)}
+                </span>
                 <button
                     type="button"
                     className="btn btn-primary"
                     onClick={() => fetchStatus(flight)}
                 >
-                    fetch status
+                    fetch
                 </button>
             </td>
             <td>

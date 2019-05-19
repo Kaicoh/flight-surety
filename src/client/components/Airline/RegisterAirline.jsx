@@ -14,6 +14,7 @@ const RegisterAirline = ({ contract, account }) => {
 
     return (
         <div>
+            <h3>Register another airline</h3>
             <form>
                 <div className="form-group">
                     <label htmlFor="airlineAddress">

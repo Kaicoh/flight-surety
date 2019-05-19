@@ -36,6 +36,7 @@ const FundAirline = ({ web3, contract, account }) => {
 
     return (
         <div>
+            <h3>Fund to participate Dapp</h3>
             {funded ? (
                 <p>Funded enough.</p>
             ) : (
