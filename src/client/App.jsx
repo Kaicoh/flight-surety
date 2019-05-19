@@ -2,6 +2,7 @@ import React, { Fragment, useEffect } from 'react';
 import useWeb3 from './hooks/useWeb3';
 import useFlights from './hooks/useFlights';
 import Airline from './components/Airline';
+import Passenger from './components/Passenger';
 
 const App = () => {
     const [web3, contract, account] = useWeb3();
@@ -37,6 +38,12 @@ const App = () => {
             {web3 && contract && account ? (
                 <Fragment>
                     <Airline
+                        web3={web3}
+                        contract={contract}
+                        account={account}
+                        flights={flights}
+                    />
+                    <Passenger
                         web3={web3}
                         contract={contract}
                         account={account}

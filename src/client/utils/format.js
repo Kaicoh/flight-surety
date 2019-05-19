@@ -9,7 +9,25 @@ const formatDate = (date) => {
 
 const formatAddress = address => `${address.slice(0, 5)}...`;
 
+const formatFlightStatus = (statusCode) => {
+    switch (statusCode) {
+    case 10:
+        return 'On Time';
+    case 20:
+        return 'Late Airline';
+    case 30:
+        return 'Late Weather';
+    case 40:
+        return 'Late Technical';
+    case 50:
+        return 'Late Other';
+    default:
+        return 'Unknown';
+    }
+};
+
 export default {
     date: formatDate,
     address: formatAddress,
+    flightStatus: formatFlightStatus,
 };

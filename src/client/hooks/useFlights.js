@@ -1,6 +1,13 @@
 import { useReducer } from 'react';
 import faker from 'faker';
 
+// if you don't need consistent flight number, set false.
+const seedSwitch = true;
+
+if (seedSwitch) {
+    faker.seed(12345);
+}
+
 /* ********************************************************************
  *                       UTILITY FUNCTIONS                            *
  ******************************************************************** */

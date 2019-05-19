@@ -5,7 +5,6 @@ import {
     accountPropType,
 } from '../../utils/propTypes';
 
-// eslint-disable-next-line object-curly-newline
 const FundAirline = ({ web3, contract, account }) => {
     const [funded, setFunded] = useState(false);
 

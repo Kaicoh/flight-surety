@@ -1,22 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-    contractPropType,
-    accountPropType,
-    flightPropType,
-} from '../../utils/propTypes';
+import { flightPropType } from '../../utils/propTypes';
 import format from '../../utils/format';
 
-// eslint-disable-next-line object-curly-newline
-const RegisterFlight = ({ row, flight, contract, account }) => {
+const RegisterFlight = ({ row, flight, registerFlight }) => {
     const { number, timestamp, airline } = flight;
     const registered = airline !== '';
-
-    const submit = () => {
-        contract.methods.registerFlight(number, timestamp)
-            .send({ from: account })
-            .catch(console.error); // eslint-disable-line no-console
-    };
 
     return (
         <tr>
@@ -28,7 +17,7 @@ const RegisterFlight = ({ row, flight, contract, account }) => {
                 <button
                     type="button"
                     className={`btn ${registered ? 'btn-secondary' : 'btn-primary'}`}
-                    onClick={submit}
+                    onClick={() => registerFlight(number, timestamp)}
                     disabled={registered}
                 >
                     {registered ? 'registered' : 'register'}
@@ -41,8 +30,7 @@ const RegisterFlight = ({ row, flight, contract, account }) => {
 RegisterFlight.propTypes = {
     row: PropTypes.number.isRequired,
     flight: flightPropType.isRequired,
-    contract: contractPropType.isRequired,
-    account: accountPropType.isRequired,
+    registerFlight: PropTypes.func.isRequired,
 };
 
 export default RegisterFlight;
