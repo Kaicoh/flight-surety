@@ -103,7 +103,7 @@ contract('FlightSuretyApp', (accounts) => {
 
     it('buys insurance', async () => {
         const { flightNumber, timestamp } = testFlight;
-        const tx = await instance.buyInsurance(airline1, flightNumber, timestamp, {
+        const tx = await instance.buyInsurance(flightNumber, timestamp, {
             from: passenger1,
             value: credit,
         });
@@ -121,7 +121,7 @@ contract('FlightSuretyApp', (accounts) => {
     it('does not buy insurance over 1 ether', async () => {
         const { flightNumber, timestamp } = testFlight;
         try {
-            await instance.buyInsurance(airline1, flightNumber, timestamp, {
+            await instance.buyInsurance(flightNumber, timestamp, {
                 from: passenger2,
                 value: web3.utils.toWei('2', 'ether'),
             });
@@ -155,7 +155,6 @@ contract('FlightSuretyApp', (accounts) => {
     it('can emit request to oracles', async () => {
         const { flightNumber, timestamp } = testFlight;
         const tx = await instance.fetchFlightStatus(
-            airline1,
             flightNumber,
             timestamp,
             { from: passenger1 },
@@ -179,7 +178,6 @@ contract('FlightSuretyApp', (accounts) => {
                 // eslint-disable-next-line no-await-in-loop
                 const tx = await instance.submitOracleResponse(
                     requestIndex,
-                    airline1,
                     flightNumber,
                     timestamp,
                     statusCode,
@@ -214,7 +212,6 @@ contract('FlightSuretyApp', (accounts) => {
             const balanceBefore = await web3.eth.getBalance(passenger1);
 
             await instance.payoutInsurance(
-                airline1,
                 flightNumber,
                 timestamp,
                 { from: passenger1, gasPrice: 0 },

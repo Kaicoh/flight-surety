@@ -30,7 +30,7 @@ contract OracleManager {
         mapping (uint8 => address[]) responses;
     }
 
-    event OracleRegistered(address account, uint8[3] indexes);
+    event OracleRegistered(address indexed account, uint8[3] indexes);
 
     /********************************************************************************************/
     /*                                       FUNCTION MODIFIERS                                 */

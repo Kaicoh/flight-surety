@@ -98,12 +98,12 @@ contract FlightSuretyData is Authorizable, AirlineControl, FlightControl, Insure
 
     /* Flights */
 
-    function registerFlight(bytes32 flightKey)
+    function registerFlight(bytes32 flightKey, address airline)
         external
         requireIsOperational
         onlyAuthorizedContract
     {
-        FlightControl.register(flightKey);
+        FlightControl.register(flightKey, airline);
     }
 
     function isFlightRegistered(bytes32 flightKey)

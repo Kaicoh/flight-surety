@@ -15,13 +15,14 @@ contract FlightControl {
         bool isRegistered;
         uint8 status;
         uint updatedTimestamp;
+        address airline;
     }
 
-    function register(bytes32 flightKey)
+    function register(bytes32 flightKey, address airline)
         internal
     {
         // solium-disable-next-line security/no-block-members
-        Flight memory newFlight = Flight(true, STATUS_CODE_UNKNOWN, now);
+        Flight memory newFlight = Flight(true, STATUS_CODE_UNKNOWN, now, airline);
         flights[flightKey] = newFlight;
     }
 
