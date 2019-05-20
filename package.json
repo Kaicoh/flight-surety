@@ -10,6 +10,7 @@
   },
   "scripts": {
     "dapp": "webpack-dev-server --open",
+    "server": "node src/server/index.js",
     "test": "yarn run compile && yarn run migrate && truffle test",
     "compile": "rimraf ./src/contracts && truffle compile",
     "migrate": "truffle migrate --reset",
@@ -46,6 +47,7 @@
   },
   "dependencies": {
     "bootstrap": "^4.3.1",
+    "express": "^4.17.0",
     "faker": "^4.1.0",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
