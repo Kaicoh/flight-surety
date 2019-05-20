@@ -20,18 +20,17 @@ class Oracle {
 
     registerOracle(contract, fee) {
         contract.methods.registerOracle()
-            .send({ from: this.account, value: fee })
+            .send({ from: this.account, value: fee, gas: 6700000 })
             .catch(console.log); // eslint-disable-line no-console
     }
 
     submitResponse(contract, event) {
-        const { flight } = event.returnValues;
-        const index = event.returnValues.index.toNumber();
+        const { flight, index } = event.returnValues;
         const timestamp = event.returnValues.timestamp.toNumber();
         const statusCode = faker.random.number(5) * 10;
 
         contract.methods.submitOracleResponse(index, flight, timestamp, statusCode)
-            .send({ from: this.account })
+            .send({ from: this.account, gas: 6700000 })
             .catch(console.log); // eslint-disable-line no-console
     }
 
@@ -46,14 +45,16 @@ class Oracle {
                 console.log(error); // eslint-disable-line no-console
                 return;
             }
-            this.indexes = event.returnValues.indexes.map(index => index.toNumber());
+
+            const { indexes } = event.returnValues;
+            this.indexes = indexes;
             this.subscribeRequestEvent(contract);
             this.isListening = true;
         });
     }
 
     subscribeRequestEvent(contract) {
-        contract.events.RequestOracle({
+        contract.events.OracleRequest({
             fromBlock: 0,
         }, (error, event) => {
             if (error) {
@@ -61,8 +62,7 @@ class Oracle {
                 return;
             }
 
-            const { index } = event.returnValues;
-            if (this.indexes.includes(index.toNumber())) {
+            if (this.indexes.includes(event.returnValues.index)) {
                 this.submitResponse(contract, event);
             }
         });

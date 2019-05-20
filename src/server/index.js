@@ -10,7 +10,7 @@ const web3 = new Web3(provider);
 
 let accounts;
 let contract;
-let oracles;
+const oracles = [];
 
 const init = async () => {
     accounts = await web3.eth.getAccounts();

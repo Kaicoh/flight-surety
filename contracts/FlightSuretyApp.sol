@@ -155,7 +155,7 @@ contract FlightSuretyApp is Operationable, OracleManager {
         isValidOracleIndex(index)
     {
         bytes32 key = _buildResponseKey(index, flight, timestamp);
-        require(OracleManager.isRequestOpen(key), "Flight or timestamp do not match oracle request");
+        require(OracleManager.isRequestOpen(key), "Request is closed");
 
         OracleManager.pushResponse(key, statusCode, msg.sender);
         emit OracleReport(flight, timestamp, statusCode);
