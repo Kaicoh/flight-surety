@@ -50,7 +50,7 @@ const Layout = ({ web3, contract, account, flights }) => {
                     web3={web3}
                     contract={contract}
                     account={account}
-                    flights={flights}
+                    flights={flights.filter(flight => flight.airline !== '')}
                 />
             )}
         </Fragment>

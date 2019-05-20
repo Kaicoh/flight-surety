@@ -11,22 +11,22 @@ import {
 // eslint-disable-next-line object-curly-newline
 const Flights = ({ web3, contract, account, flights, containerClass }) => {
     const buyInsurance = (flight, amount) => {
-        const { airline, number, timestamp } = flight;
-        contract.methods.buyInsurance(airline, number, timestamp)
+        const { number, timestamp } = flight;
+        contract.methods.buyInsurance(number, timestamp)
             .send({ from: account, value: web3.utils.toWei(amount, 'ether') })
             .catch(console.error); // eslint-disable-line no-console
     };
 
     const fetchStatus = (flight) => {
-        const { airline, number, timestamp } = flight;
-        contract.methods.fetchFlightStatus(airline, number, timestamp)
+        const { number, timestamp } = flight;
+        contract.methods.fetchFlightStatus(number, timestamp)
             .send({ from: account })
             .catch(console.error); // eslint-disable-line no-console
     };
 
     const withdrawal = (flight) => {
-        const { airline, number, timestamp } = flight;
-        contract.methods.payoutInsurance(airline, number, timestamp)
+        const { number, timestamp } = flight;
+        contract.methods.payoutInsurance(number, timestamp)
             .send({ from: account })
             .catch(console.error); // eslint-disable-line no-console
     };
@@ -34,32 +34,34 @@ const Flights = ({ web3, contract, account, flights, containerClass }) => {
     return (
         <div className={containerClass}>
             <h3>Flights</h3>
-            <p>You can buy insurances of flights only registered by airline</p>
-            <table className="table">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">airline</th>
-                        <th scope="col">flight number</th>
-                        <th scope="col">departure</th>
-                        <th scope="col">status</th>
-                        <th scope="col">buy insurance</th>
-                        <th scope="col">payout</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {flights.map((flight, index) => (
-                        <Flight
-                            key={`${flight.number}${flight.timestamp.toString()}`}
-                            row={index + 1}
-                            flight={flight}
-                            buyInsurance={buyInsurance}
-                            fetchStatus={fetchStatus}
-                            withdrawal={withdrawal}
-                        />
-                    ))}
-                </tbody>
-            </table>
+            {flights.length > 0 ? (
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">flight number</th>
+                            <th scope="col">departure</th>
+                            <th scope="col">status</th>
+                            <th scope="col">buy insurance</th>
+                            <th scope="col">payout</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {flights.map((flight, index) => (
+                            <Flight
+                                key={`${flight.number}${flight.timestamp.toString()}`}
+                                row={index + 1}
+                                flight={flight}
+                                buyInsurance={buyInsurance}
+                                fetchStatus={fetchStatus}
+                                withdrawal={withdrawal}
+                            />
+                        ))}
+                    </tbody>
+                </table>
+            ) : (
+                <p>There are no flights registered by any airlines.</p>
+            )}
         </div>
     );
 };

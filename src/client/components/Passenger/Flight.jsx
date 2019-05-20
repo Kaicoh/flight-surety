@@ -13,7 +13,6 @@ const Flight = ({ row, flight, buyInsurance, fetchStatus, withdrawal }) => {
     return (
         <tr>
             <th scope="row">{row}</th>
-            <td>{registered ? format.address(airline) : 'Not registered'}</td>
             <td>{number}</td>
             <td>{format.date(new Date(timestamp))}</td>
             <td>
