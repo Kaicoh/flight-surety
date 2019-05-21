@@ -1,16 +1,16 @@
 const faker = require('faker');
 
 class Oracle {
-    constructor(account) {
+    constructor(account, statusCode) {
         this.account = account;
         this.indexes = [];
         this.isListening = false;
-        this.option = {
-            filter: {
-                account: this.account,
-            },
-            fromBlock: 0,
-        };
+
+        if (statusCode === undefined) {
+            this.statusCode = faker.random.number(5) * 10;
+        } else {
+            this.statusCode = parseInt(statusCode, 10);
+        }
     }
 
     startListening(contract, fee) {
@@ -27,9 +27,8 @@ class Oracle {
     submitResponse(contract, event) {
         const { flight, index } = event.returnValues;
         const timestamp = event.returnValues.timestamp.toNumber();
-        const statusCode = faker.random.number(5) * 10;
 
-        contract.methods.submitOracleResponse(index, flight, timestamp, statusCode)
+        contract.methods.submitOracleResponse(index, flight, timestamp, this.statusCode)
             .send({ from: this.account, gas: 6700000 })
             .catch(console.log); // eslint-disable-line no-console
     }

@@ -23,11 +23,12 @@ const init = async () => {
         deployedNetwork && deployedNetwork.address,
     );
 
+    const statusCode = process.env.STATUS_CODE;
     const registrationFee = web3.utils.toWei('1', 'ether');
 
     // register 20 oracles
     accounts.slice(10, 30).forEach((account) => {
-        const oracle = new Oracle(account);
+        const oracle = new Oracle(account, statusCode);
         oracle.startListening(contract, registrationFee);
         oracles.push(oracle);
     });
@@ -42,5 +43,5 @@ app.get('/', (req, res) => {
 
 app.listen(8080, () => {
     // eslint-disable-next-line no-console
-    console.log('client app is running on port 8000');
+    console.log('Oracle server is running on port 8080');
 });
