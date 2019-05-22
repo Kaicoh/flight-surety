@@ -514,7 +514,7 @@ contract('FlightSuretyApp', (accounts) => {
         });
     });
 
-    describe('payoutInsurance function', () => {
+    describe('withdrawalRefund function', () => {
         it('allows passengers to withdrawal payout', async () => {
             if (!canPayout) {
                 // eslint-disable-next-line no-console
@@ -525,7 +525,7 @@ contract('FlightSuretyApp', (accounts) => {
             const { flightNumber, timestamp } = testFlight;
             const balanceBefore = await web3.eth.getBalance(passenger1);
 
-            await instance.payoutInsurance(
+            await instance.withdrawalRefund(
                 flightNumber,
                 timestamp,
                 { from: passenger1, gasPrice: 0 },
@@ -550,7 +550,7 @@ contract('FlightSuretyApp', (accounts) => {
             });
 
             try {
-                await instance.payoutInsurance(
+                await instance.withdrawalRefund(
                     flightNumber,
                     timestamp,
                     { from: passenger1, gasPrice: 0 },
@@ -574,7 +574,7 @@ contract('FlightSuretyApp', (accounts) => {
             await instance.setOperatingStatus(false, { from: owner });
 
             try {
-                await instance.payoutInsurance(
+                await instance.withdrawalRefund(
                     flightNumber,
                     timestamp,
                     { from: passenger1, gasPrice: 0 },

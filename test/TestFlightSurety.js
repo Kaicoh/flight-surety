@@ -204,7 +204,7 @@ contract('FlightSurety', (accounts) => {
             // a passenger withdrawals payout
             const balanceBefore = await web3.eth.getBalance(passenger1);
 
-            await appContract.payoutInsurance(
+            await appContract.withdrawalRefund(
                 flightNumber,
                 timestamp,
                 { from: passenger1, gasPrice: 0 },

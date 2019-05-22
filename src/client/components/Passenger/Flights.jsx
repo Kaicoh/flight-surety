@@ -26,7 +26,7 @@ const Flights = ({ web3, contract, account, flights, containerClass }) => {
 
     const withdrawal = (flight) => {
         const { number, timestamp } = flight;
-        contract.methods.payoutInsurance(number, timestamp)
+        contract.methods.withdrawalRefund(number, timestamp)
             .send({ from: account })
             .catch(console.error); // eslint-disable-line no-console
     };

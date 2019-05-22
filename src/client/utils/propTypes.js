@@ -16,7 +16,7 @@ export const contractPropType = PropTypes.shape({
 
         // Insurance methods
         buyInsurance: PropTypes.func.isRequired,
-        payoutInsurance: PropTypes.func.isRequired,
+        withdrawalRefund: PropTypes.func.isRequired,
     }).isRequired,
 });
 

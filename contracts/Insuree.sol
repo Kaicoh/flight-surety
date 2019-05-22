@@ -9,7 +9,7 @@ contract Insuree {
         insurances[key] = amount;
     }
 
-    function payout(bytes32 key) internal returns(uint) {
+    function refund(bytes32 key) internal returns(uint) {
         require(insurances[key] > 0, "No amount to payout");
 
         uint amount = insurances[key];

@@ -140,12 +140,12 @@ contract FlightSuretyData is Authorizable, AirlineControl, FlightControl, Insure
         Insuree.register(insuranceKey, amount);
     }
 
-    function payoutInsurance(bytes32 insuranceKey)
+    function withdrawalRefund(bytes32 insuranceKey)
         external
         requireIsOperational
         onlyAuthorizedContract
         returns(uint)
     {
-        return Insuree.payout(insuranceKey);
+        return Insuree.refund(insuranceKey);
     }
 }
