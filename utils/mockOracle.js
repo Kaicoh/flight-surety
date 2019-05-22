@@ -1,6 +1,7 @@
 class MockOracle {
     constructor(address) {
         this.address = address;
+        this.indexes = [];
     }
 
     setIndexes(indexes) {

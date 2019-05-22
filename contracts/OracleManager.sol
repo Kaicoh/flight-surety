@@ -9,9 +9,6 @@ contract OracleManager {
     // Incremented to add pseudo-randomness at various points
     uint8 private nonce = 0;
 
-    // Fee to be paid when registering oracle
-    uint256 private constant REGISTRATION_FEE = 1 ether;
-
     // Track all registered oracles
     mapping(address => Oracle) private oracles;
 
@@ -54,10 +51,7 @@ contract OracleManager {
     /********************************************************************************************/
 
     // Register an oracle with the contract
-    function registerOracle() external payable {
-        // Require registration fee
-        require(msg.value >= REGISTRATION_FEE, "Registration fee is required");
-
+    function registerOracle() public payable {
         uint8[3] memory indexes = generateIndexes(msg.sender);
 
         oracles[msg.sender] = Oracle({
@@ -99,7 +93,7 @@ contract OracleManager {
         oracleResponses[key].responses[statusCode].push(account);
     }
 
-    function getResponeCount(bytes32 key, uint8 statusCode) internal view returns(uint) {
+    function getResponseCount(bytes32 key, uint8 statusCode) internal view returns(uint) {
         return oracleResponses[key].responses[statusCode].length;
     }
 

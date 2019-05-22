@@ -15,6 +15,7 @@ contract FlightSuretyApp is Operationable, OracleManager {
     uint private constant REGISTERING_AIRLINE_WITHOUT_CONSENSUS = 4;
     uint private constant AIRLINE_DEPOSIT_THRESHOLD = 10 ether;
     uint private constant MAX_INSURANCE = 1 ether;
+    uint private constant ORACLE_REGISTRATION_FEE = 1 ether;
     uint private constant MIN_ORACLE_RESPONSES = 3;
 
     FlightSuretyData flightSuretyData;
@@ -135,6 +136,7 @@ contract FlightSuretyApp is Operationable, OracleManager {
 
     function fetchFlightStatus(string memory flight, uint timestamp)
         public
+        requireIsOperational
     {
         uint8 index = getRandomIndex(msg.sender);
         bytes32 key = _buildResponseKey(index, flight, timestamp);
@@ -144,6 +146,15 @@ contract FlightSuretyApp is Operationable, OracleManager {
         emit OracleRequest(flight, timestamp, index);
     }
 
+    function registerOracle()
+        public
+        payable
+        requireIsOperational
+    {
+        require(msg.value >= ORACLE_REGISTRATION_FEE, "Inadequet registration fee");
+        super.registerOracle();
+    }
+
     function submitOracleResponse(
         uint8 index,
         string memory flight,
@@ -151,6 +162,7 @@ contract FlightSuretyApp is Operationable, OracleManager {
         uint8 statusCode
     )
         public
+        requireIsOperational
         isRegisteredOracle
         isValidOracleIndex(index)
     {
@@ -160,7 +172,7 @@ contract FlightSuretyApp is Operationable, OracleManager {
         OracleManager.pushResponse(key, statusCode, msg.sender);
         emit OracleReport(flight, timestamp, statusCode);
 
-        if (OracleManager.getResponeCount(key, statusCode) >= MIN_ORACLE_RESPONSES) {
+        if (OracleManager.getResponseCount(key, statusCode) >= MIN_ORACLE_RESPONSES) {
 
             OracleManager.closeRequest(key);
 
