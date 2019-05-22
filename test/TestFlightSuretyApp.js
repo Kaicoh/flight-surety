@@ -20,7 +20,7 @@ contract('FlightSuretyApp', (accounts) => {
     const credit = web3.utils.toWei('1', 'ether');
     const expectedPayout = web3.utils.toWei('1.5', 'ether');
 
-    const oracles = MockOracle.build(accounts.slice(10, 30));
+    const oracles = accounts.slice(10, 30).map(account => new MockOracle(account));
 
     const testFlight = {
         flightNumber: 'TEST123',

@@ -1,10 +1,10 @@
 class MockOracle {
-    static build(addresses) {
-        return addresses.map(address => new MockOracle(address));
-    }
-
     constructor(address) {
         this.address = address;
+    }
+
+    setIndexes(indexes) {
+        this.indexes = indexes.map(index => index.toNumber());
     }
 
     hasIndex(index) {

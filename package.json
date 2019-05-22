@@ -11,7 +11,7 @@
   "scripts": {
     "dapp": "webpack-dev-server --open",
     "server": "node src/server/index.js",
-    "test": "yarn run compile && yarn run migrate && truffle test",
+    "test": "yarn run compile && yarn run migrate && truffle test ./test/TestFlightSurety.js",
     "compile": "rimraf ./src/contracts && truffle compile",
     "migrate": "truffle migrate --reset",
     "ganache": "dotenv ./start_ganache.sh",
